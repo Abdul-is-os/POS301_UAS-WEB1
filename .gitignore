@@ -1,0 +1,15 @@
+# Abaikan file konfigurasi database (karena ada password)
+config.php
+../config.php
+
+# Abaikan folder log error
+logs/
+*.log
+
+db_tester_bruno/
+bruno.json
+get.bru
+
+# Abaikan file sistem sampah
+.DS_Store
+Thumbs.db
