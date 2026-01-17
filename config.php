@@ -2,7 +2,7 @@
 $host = "localhost"; 
 $username = "root";
 $pass = "";
-$db = "nama database";
+$db = "db_pos_301";
 
 $conn = new mysqli($host, $username, $pass, $db);
 if ($conn->connect_error) {

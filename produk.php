@@ -103,7 +103,7 @@ if (!isset($_SESSION['user_id'])) {
             </a>
             
             <?php if($_SESSION['role'] === 'admin'): ?>
-            <a href="#" class="nav-link" onclick="loadPage('users')">
+            <a href="users.php" class="nav-link" onclick="loadPage('users')">
                 <i class="bi bi-people"></i> Users
             </a>
             <?php endif; ?>
