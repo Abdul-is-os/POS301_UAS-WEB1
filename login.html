@@ -1,55 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - POS System</title>
     <link href="bootstrap-5.3.8-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
     <style>
+        /* Menggunakan Variabel Warna yang sama dengan Dashboard */
+        :root {
+            --hijau-tercerah: #96c1ba;
+            --hijau-tergelap: #397c67;
+            --hijau-radagelap: #539c85;
+        }
+
         body {
-            background-color: #f4f6f9;
+            /* Background Gradient sesuai tema */
+            background: linear-gradient(135deg, var(--hijau-tercerah), var(--hijau-tergelap));
             height: 100vh;
             display: flex;
             align-items: center;
-            justify_content: center;
+            justify-content: center; /* Perbaikan typo dari kode lama */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         .login-card {
             width: 100%;
             max-width: 400px;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             background: white;
         }
+
         .brand-logo {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #0d6efd;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+        }
+        
+        /* Menggunakan logo gambar agar konsisten dengan sidebar */
+        .brand-logo img {
+            max-width: 180px;
+            height: auto;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--hijau-tergelap);
+        }
+
+        /* Custom Input agar focus-nya warna hijau */
+        .form-control:focus {
+            border-color: var(--hijau-radagelap);
+            box-shadow: 0 0 0 0.25rem rgba(83, 156, 133, 0.25);
+        }
+
+        /* Tombol Login Tema Hijau */
+        .btn-custom {
+            background-color: var(--hijau-tergelap);
+            border: none;
+            font-weight: bold;
+            padding: 12px;
+            transition: all 0.3s;
+        }
+        
+        .btn-custom:hover {
+            background-color: var(--hijau-radagelap);
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
 
     <div class="login-card">
-        <div class="brand-logo">POS System</div>
-        <h5 class="text-center mb-4 text-muted">Sign in to start your session</h5>
+        <div class="brand-logo">
+            <img src="assets/images/logo.png" alt="POS System Logo">
+        </div>
+        
+        <h5 class="text-center mb-4 text-secondary">Silakan Login</h5>
         
         <div id="error-alert" class="alert alert-danger d-none" role="alert"></div>
 
-<form id="loginForm">
-    <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input type="text" class="form-control" id="username" required>
+        <form id="loginForm">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-person-fill text-muted"></i></span>
+                    <input type="text" class="form-control" id="username" placeholder="Masukkan username" required>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-lock-fill text-muted"></i></span>
+                    <input type="password" class="form-control" id="password" placeholder="Masukkan password" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-custom w-100">
+                MASUK <i class="bi bi-box-arrow-in-right"></i>
+            </button>
+        </form>
+        
+        <div class="text-center mt-4">
+            <small class="text-muted">&copy; 2026 POS System - All Rights Reserved</small>
+        </div>
     </div>
-    <div class="mb-4">
-        <label for="password" class="form-label">Password</label>
-        <input type="password" class="form-control" id="password" required>
-    </div>
-    <button type="submit" class="btn btn-primary w-100">Login</button>
-</form>
 
-<script src="js/login.js"></script>
+    <script src="js/login.js"></script>
 </body>
 </html>
