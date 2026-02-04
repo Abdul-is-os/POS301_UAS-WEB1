@@ -211,6 +211,7 @@ if (!isset($_SESSION['user_id'])) {
     </div>
 
     <div class="main-content">
+
         
         <div class="top-bar">
             <h4 class="m-0">Dashboard Overview</h4>
@@ -267,6 +268,12 @@ if (!isset($_SESSION['user_id'])) {
             </div>
         </div>
     </div>
+
+    <div class="container-fluid p-4">
+             </div>
+    </div>
+
+    <?php include 'footer.php'; ?>
 
     <script src="bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js"></script>
 
