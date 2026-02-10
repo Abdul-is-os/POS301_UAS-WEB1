@@ -8,9 +8,6 @@
 Sistem Kasir (POS) sederhana namun handal yang dibangun menggunakan **PHP Native** dan **MySQL**. Proyek ini dikembangkan untuk memenuhi tugas Ujian Akhir Semester (UAS) mata kuliah Pemrograman Web dan Keamanan Informasi.
 
 **Halaman Web** https://aspel.cyou/ABDUL_UAS/
-contoh login
-username : contohkasir
-password : Kasir123
 ---
 
 ## 📖 Mengenai Sistem
