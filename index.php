@@ -1,10 +1,30 @@
 <?php
+include 'config.php';
 session_start();
-// Cek login (biarkan saja, tidak kita ubah logikanya)
+
+// Cek login
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.html");
+    header("Location: login.html"); // Pastikan ini mengarah ke file login yang benar (php/html)
     exit();
 }
+
+// --- LOGIKA HITUNG DASHBOARD ---
+
+// 1. Menghitung Jumlah Transaksi
+$query_transaksi = mysqli_query($conn, "SELECT COUNT(*) as jumlah_struk FROM sales");
+$data_transaksi = mysqli_fetch_assoc($query_transaksi);
+$total_transaksi = $data_transaksi['jumlah_struk'] ?: 0;
+
+// 2. Menghitung Total Pendapatan (Semua Waktu)
+$query_pendapatan = mysqli_query($conn, "SELECT SUM(total_amount) as total_uang FROM sales");
+$data_pendapatan = mysqli_fetch_assoc($query_pendapatan);
+$total_pendapatan = $data_pendapatan['total_uang'] ?: 0; // Perbaikan nama variabel array
+
+// 3. Menghitung Pendapatan HARI INI
+$tanggal_hari_ini = date('Y-m-d');
+$query_today = mysqli_query($conn, "SELECT SUM(total_amount) as duit_hari_ini FROM sales WHERE DATE(created_at) = '$tanggal_hari_ini'");
+$data_today = mysqli_fetch_assoc($query_today);
+$pendapatan_hari_ini = $data_today['duit_hari_ini'] ?: 0;
 ?>
 
 <!DOCTYPE html>
@@ -12,14 +32,11 @@ if (!isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DASHBOARD KASIR </title>
+    <title>DASHBOARD KASIR</title>
     
     <link href="bootstrap-5.3.8-dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    
     <style>
         :root {
             --bg-dark: #02021e;      
@@ -32,9 +49,14 @@ if (!isset($_SESSION['user_id'])) {
             --text-primary: #ffff;
             --text-secondary: #fefefeff;
             --accent-blue: #539c85ff;
-            --sidebar-color: #98c2bbff;
-            --merah: #ff4c4c;
             --sidebar-width: 210px;
+        }
+
+        /* RESET DEFAULT MARGIN/PADDING */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
         }
 
         body {
@@ -50,8 +72,7 @@ if (!isset($_SESSION['user_id'])) {
             background-color: var(--hijau-tergelap);
             min-height: 100vh;
             position: fixed;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             padding: 20px;
             border-right: 1px solid var(--hijau-radagelap);
             z-index: 1000;
@@ -79,6 +100,7 @@ if (!isset($_SESSION['user_id'])) {
             display: flex;
             align-items: center;
             gap: 10px;
+            text-decoration: none;
         }
 
         .nav-link:hover, .nav-link.active {
@@ -93,83 +115,69 @@ if (!isset($_SESSION['user_id'])) {
             margin-top: 20px;
             margin-bottom: 10px;
             padding-left: 10px;
+            display: block;
         }
 
         /* --- MAIN CONTENT --- */
-       .main-content {
+        .main-content {
             margin-left: var(--sidebar-width);
-            padding: 0; 
             background-color: var(--hijau-tercerah);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* --- HEADER / TOP BAR --- */
         .top-bar {
             background-color: var(--hijau-radagelap); 
             color: white; 
-            padding: 20px 30px; 
+            padding: 15px 30px; /* Padding sedikit dikecilkan agar proporsional */
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            /* Pastikan menempel ke atas */
+            margin-top: 0;
+            width: 100%;
         }
 
         .content-wrapper {
-            padding: 0 30px 30px 30px;
+            padding: 30px;
+            flex: 1; /* Agar footer terdorong ke bawah */
         }
-
-    
 
         .profile-area {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-
-        /* --- CARDS --- */
-        .stat-card {
-            background-color: var(--accent-blue);
+        
+        /* --- CARDS STYLING --- */
+        .card-custom {
+            background-color: var(--hijau-radagelap); /* Menggunakan warna tema */
             border-radius: 15px;
-            padding: 20px;
-            border: none;
+            padding: 25px;
             height: 100%;
             transition: transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         
-        .stat-card:hover {
+        .card-custom:hover {
             transform: translateY(-5px);
         }
-
-        .icon-box {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-bottom: 15px;
+        
+        .card-title-text {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            opacity: 0.9;
         }
         
-        /* Warna-warni Icon */
-        .bg-icon-purple { background: rgba(201, 200, 204, 0.2); color: #ffff; }
-        .bg-icon-green  { background: rgba(201, 200, 204, 0.2); color: #ffff; }
-        .bg-icon-blue   { background: rgba(201, 200, 204, 0.2); color: #ffff; }
-        .bg-icon-orange { background: rgba(201, 200, 204, 0.2); color: #ffff; }
-
-        .stat-title { color: var(--text-secondary); font-size: 14px; }
-        .stat-value { font-size: 28px; font-weight: bold; margin: 5px 0; }
-        .stat-change { font-size: 12px; }
-        .text-up { color: #ffff; }
-        .text-down { color: #ffff; }
-
-        /* --- CHARTS AREA --- */
-        .chart-container {
-            background-color: var(--hijau-radagelap);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 25px;
+        .card-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0;
         }
     </style>
 </head>
@@ -182,7 +190,7 @@ if (!isset($_SESSION['user_id'])) {
 
         <nav class="nav flex-column">
             <span class="nav-section-title">Menu Utama</span>
-            <a href="index.php" class="nav-link active" onclick="loadPage('dashboard')">
+            <a href="index.php" class="nav-link active">
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
             <a href="transaksi.php" class="nav-link" >
@@ -211,77 +219,71 @@ if (!isset($_SESSION['user_id'])) {
     </div>
 
     <div class="main-content">
-
-        
         <div class="top-bar">
-            <h4 class="m-0">Dashboard Overview</h4>
+            <h4 class="m-0 fw-bold">Dashboard Overview</h4>
             
             <div class="d-flex align-items-center gap-3">
                 <div class="profile-area">
                     <div class="text-end d-none d-md-block">
-                        <small class="d-block text-white-50">Admin</small>
-                        <span class="fw-bold"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
+                        <small class="d-block text-white-50">
+                            <?php echo isset($_SESSION['role']) ? ucfirst($_SESSION['role']) : 'User'; ?>
+                        </small>
+                        <span class="fw-bold"><?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Guest'; ?></span>
                     </div>
-                    <img src="https://ui-avatars.com/api/?name=<?php echo $_SESSION['username']; ?>&background=random" class="rounded-circle" width="40">
+                    <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;">
+                        <?php echo isset($_SESSION['username']) ? strtoupper(substr($_SESSION['username'], 0, 2)) : 'GU'; ?>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="content-wrapper">
+            <div class="row g-4">
+                
+                <div class="col-md-4">
+                    <div class="card-custom text-white">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="card-title-text text-white-50">Total Transaksi</div>
+                                <div class="card-value"><?php echo number_format($total_transaksi); ?></div>
+                                <small>Transaksi Berhasil</small>
+                            </div>
+                            <i class="bi bi-receipt fs-1 text-white-50"></i>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="row g-4">
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="icon-box bg-icon-purple">
-                        <i class="bi bi-bag-check"></i>
-                    </div>
-                    <div class="stat-title">Total Penjualan</div>
-                    <div class="stat-value">Rp 12.5jt</div>
-                    <div class="stat-change text-up">
-                        <i class="bi bi-arrow-up-short"></i> +2.00% (30 hari)
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="icon-box bg-icon-green">
-                        <i class="bi bi-cash-stack"></i>
-                    </div>
-                    <div class="stat-title">Total Pendapatan</div>
-                    <div class="stat-value">Rp 8.2jt</div>
-                    <div class="stat-change text-up">
-                        <i class="bi bi-arrow-up-short"></i> +5.45%
+                <div class="col-md-4">
+                    <div class="card-custom text-white">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="card-title-text text-white-50">Total Pendapatan</div>
+                                <div class="card-value">Rp <?php echo number_format($total_pendapatan, 0, ',', '.'); ?></div>
+                                <small>Semua Waktu</small>
+                            </div>
+                            <i class="bi bi-cash-coin fs-1 text-white-50"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="icon-box bg-icon-orange">
-                        <i class="bi bi-wallet2"></i>
-                    </div>
-                    <div class="stat-title">Total Pengeluaran</div>
-                    <div class="stat-value">Rp 4.3jt</div>
-                    <div class="stat-change text-down">
-                        <i class="bi bi-arrow-down-short"></i> -2.00%
+
+                <div class="col-md-4">
+                    <div class="card-custom text-white">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="card-title-text text-warning">Pendapatan Hari Ini</div>
+                                <div class="card-value">Rp <?php echo number_format($pendapatan_hari_ini, 0, ',', '.'); ?></div>
+                                <small class="text-white-50"><?php echo date('d M Y'); ?></small>
+                            </div>
+                            <i class="bi bi-calendar-check fs-1 text-warning"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+
+            </div> </div>
+
+        <?php include 'footer.php'; ?>
     </div>
-
-    <div class="container-fluid p-4">
-             </div>
-    </div>
-
-    <?php include 'footer.php'; ?>
 
     <script src="bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        function loadPage(page) {
-            console.log("Navigasi ke: " + page);
-            // Nanti kita buat logika ganti halaman disini
-        }
-    </script>
 </body>
 </html>
