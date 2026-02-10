@@ -75,8 +75,8 @@ Setelah aplikasi terbuka, gunakan akun default berikut untuk masuk ke dalam sist
 
 | Role | Username | Password | Hak Akses |
 | :--- | :--- | :--- | :--- |
-| **Admin** | `admin` | `password` | Full Akses (Dashboard, Kelola Produk, Laporan, User). |
-| **Kasir** | `` | `` | Terbatas (Hanya akses menu Transaksi Kasir). |
+| **Admin** | `admin` | `` | Full Akses (Dashboard, Kelola Produk, Laporan, User). |
+| **Kasir** | `contohkasir` | `Kasir123` | Terbatas (Hanya akses menu Transaksi Kasir). |
 
 > **Catatan:** Demi keamanan, sangat disarankan untuk segera mengganti password default ini melalui menu *USER* setelah berhasil login.
 
